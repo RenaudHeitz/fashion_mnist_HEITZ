@@ -73,7 +73,7 @@ print(clf.summary())
 clf.fit(
     x_train, 
     y_train, 
-    epochs=30, 
+    epochs=40, 
     batch_size=32, 
     validation_data=(x_test, y_test)
 )
