@@ -30,7 +30,7 @@ clf.add(
 )
 clf.add(
     Conv2D(
-        32, (2, 2), 
+        32, (3, 3), 
         padding='same', 
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform'
@@ -40,7 +40,7 @@ clf.add(MaxPool2D(padding='same'))
 
 clf.add(
     Conv2D(
-        32, (2, 2), 
+        32, (3, 3), 
         padding='same', 
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform', 
@@ -73,7 +73,7 @@ print(clf.summary())
 clf.fit(
     x_train, 
     y_train, 
-    epochs=20, 
+    epochs=30, 
     batch_size=32, 
     validation_data=(x_test, y_test)
 )
