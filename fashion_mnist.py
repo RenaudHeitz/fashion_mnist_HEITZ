@@ -1,3 +1,5 @@
+# https://medium.com/@lukaszlipinski/fashion-mnist-with-keras-in-5-minuts-20ab9eb7b905
+
 from keras.datasets import fashion_mnist
 from keras.layers import Dense, MaxPool2D, Conv2D, Dropout
 from keras.layers import Flatten, InputLayer
@@ -36,7 +38,19 @@ clf.add(
         kernel_initializer='random_uniform'
     )
 )
+
 clf.add(MaxPool2D(padding='same'))
+
+#clf.add(Dropout(0,3))
+
+clf.add(
+    Conv2D(
+        32, (3, 3), 
+        padding='same', 
+        bias_initializer=Constant(0.01), 
+        kernel_initializer='random_uniform'
+    )
+)
 
 clf.add(
     Conv2D(
@@ -48,6 +62,7 @@ clf.add(
     )
 )
 clf.add(MaxPool2D(padding='same'))
+clf.add(Dropout(0,3))
 
 clf.add(Flatten())
 
