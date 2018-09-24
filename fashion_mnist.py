@@ -1,7 +1,7 @@
 # https://medium.com/@lukaszlipinski/fashion-mnist-with-keras-in-5-minuts-20ab9eb7b905
 
 from keras.datasets import fashion_mnist
-from keras.layers import Dense, MaxPool2D, Conv2D, Dropout
+from keras.layers import Dense, MaxPool2D, Conv2D, Dropout, LeakyRelu
 from keras.layers import Flatten, InputLayer
 from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential
@@ -30,49 +30,43 @@ clf.add(
 clf.add(
     BatchNormalization()
 )
+
+clf.add(Conv2D(64, (4, 4), padding='same'))
+clf.add(LeakyRelu())
+clf.add(MaxPool2D(padding='same'))
+clf.add(Dropout(0.1))
+
+
 clf.add(
     Conv2D(
-        64, (3, 3), 
+        64, (4, 4), 
         padding='same', 
         bias_initializer=Constant(0.01), 
-        kernel_initializer='random_uniform'
+        kernel_initializer='random_uniform',
     )
 )
+clf.add(LeakyRelu())
 
 clf.add(MaxPool2D(padding='same'))
 
-#clf.add(Dropout(0,3))
-
-clf.add(
-    Conv2D(
-        32, (3, 3), 
-        padding='same', 
-        bias_initializer=Constant(0.01), 
-        kernel_initializer='random_uniform'
-    )
-)
-
-clf.add(
-    Conv2D(
-        32, (3, 3), 
-        padding='same', 
-        bias_initializer=Constant(0.01), 
-        kernel_initializer='random_uniform', 
-        input_shape=(1, 28, 28)
-    )
-)
-clf.add(MaxPool2D(padding='same'))
-clf.add(Dropout(0,3))
+clf.add(Dropout(0.3))
 
 clf.add(Flatten())
 
 clf.add(
     Dense(
-        128,
+        256,
         activation='relu',
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform',         
     )
+)
+clf.add(Dropout(0.5))
+
+clf.add(Dense(64, activation='relu'))
+
+clf.add(
+    BatchNormalization()
 )
 
 clf.add(Dense(10, activation='softmax'))
@@ -89,7 +83,7 @@ clf.fit(
     x_train, 
     y_train, 
     epochs=20, 
-    batch_size=32, 
+    batch_size=250, 
     validation_data=(x_test, y_test)
 )
 
