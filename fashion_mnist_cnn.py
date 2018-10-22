@@ -5,7 +5,7 @@ from keras.datasets import fashion_mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 import os
@@ -46,7 +46,7 @@ model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.1))
 model.add(Flatten())
 model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.1))
+model.add(Dropout(0.2))
 model.add(Dense(num_classes, activation='softmax'))
 
 # Save the checkpoint in the /output folder
@@ -62,8 +62,8 @@ checkpoint = ModelCheckpoint(filepath,
                             save_best_only=True,
                             mode='max')
 
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=2, min_lr=0.001)
+reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.2,
+                              patience=2, min_lr=0.001, min_delta=0.009)
 
 model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
