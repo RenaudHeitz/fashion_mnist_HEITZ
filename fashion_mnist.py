@@ -7,7 +7,9 @@ from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential
 from keras.utils import np_utils
 from keras.initializers import Constant
+from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
+
 
 # Load data
 # Function load_minst is available in git.
@@ -34,23 +36,16 @@ clf.add(
 clf.add(Conv2D(64, (4, 4), padding='same'))
 clf.add(LeakyReLU())
 clf.add(MaxPool2D(padding='same'))
-#clf.add(Dropout(0.1))
 
 
 clf.add(
     Conv2D(
-        64, (4, 4), 
+        128, (4, 4), 
         padding='same', 
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform',
     )
 )
-
-clf.add(LeakyReLU())
-
-clf.add(MaxPool2D(padding='same'))
-
-#clf.add(Dropout(0.3))
 
 clf.add(
     Conv2D(
@@ -63,8 +58,6 @@ clf.add(
 clf.add(LeakyReLU())
 
 clf.add(MaxPool2D(padding='same'))
-
-#clf.add(Dropout(0.3))
 
 clf.add(Flatten())
 
@@ -76,7 +69,7 @@ clf.add(
         kernel_initializer='random_uniform',         
     )
 )
-#clf.add(Dropout(0.5))
+clf.add(Dropout(0.5))
 
 clf.add(Dense(64, activation='relu'))
 
@@ -94,12 +87,31 @@ clf.compile(
 
 print(clf.summary())
 
+
+
+datagen = ImageDataGenerator(
+    featurewise_center=True,
+    featurewise_std_normalization=True,
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True)
+
+clf.fit_generator(datagen.flow(x_train, y_train, batch_size=250),
+                              steps_per_epoch=int(np.ceil(x_train.shape[0] / float(250))),
+                              epochs=5,
+                              validation_data=(x_test, y_test))
+
+checkpointer = ModelCheckpoint(filepath='model.weights.best.hdf5', verbose=1, save_best_only=True)
+
 clf.fit(
     x_train, 
-    y_train, 
-    epochs=40, 
+    y_train,
+    shuffle=True, 
+    epochs=10, 
     batch_size=250, 
-    validation_data=(x_test, y_test)
+    validation_data=(x_test, y_test),
+    callbacks=checkpointer
 )
 
 clf.evaluate(x_test, y_test)
