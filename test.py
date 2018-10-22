@@ -24,7 +24,7 @@ clf.add(
 )
 clf.add(
     Conv2D(
-        32, (2, 2), 
+        128, (4, 4), 
         padding='same', 
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform'
@@ -33,7 +33,7 @@ clf.add(
 clf.add(MaxPool2D(padding='same'))
 clf.add(
    Conv2D(
-        32, (2, 2), 
+        128, (4, 4), 
         padding='same', 
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform', 
@@ -44,7 +44,7 @@ clf.add(MaxPool2D(padding='same'))
 clf.add(Flatten())
 clf.add(
     Dense(
-        128,
+        256,
         activation='relu',
         bias_initializer=Constant(0.01), 
         kernel_initializer='random_uniform',         
@@ -61,7 +61,7 @@ clf.fit(
    x_train, 
    y_train, 
    epochs=20, 
-   batch_size=32, 
+   batch_size=250, 
    validation_data=(x_test, y_test)
 )
 clf.evaluate(x_test, y_test)
