@@ -11,9 +11,9 @@ from keras.preprocessing.image import ImageDataGenerator
 import os
 import numpy as np
 
-batch_size = 128
+batch_size = 256
 num_classes = 10
-epochs = 10
+epochs = 18
 
 img_rows, img_cols = 28, 28
 
@@ -50,7 +50,7 @@ model.add(Dropout(0.2))
 model.add(Dense(num_classes, activation='softmax'))
 
 # Save the checkpoint in the /output folder
-filepath = "best.hdf5"
+filepath = "./best.hdf5"
 
 if os.path.exists(filepath) == True:
 	model.load_weights(filepath)
@@ -62,14 +62,15 @@ checkpoint = ModelCheckpoint(filepath,
                             save_best_only=True,
                             mode='max')
 
-reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.2,
-                              patience=2, min_lr=0.001, min_delta=0.009)
+reduce_lr = ReduceLROnPlateau(monitor='acc', factor=0.2,
+                              patience=2, min_lr=0.01, min_delta=0.01)
 
 model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
 print(model.summary())
-model.fit(x_train, y_train, batch_size=batch_size, shuffle=True ,epochs=epochs, verbose=1, validation_data=(x_test, y_test), callbacks=[checkpoint, reduce_lr])
+model.fit(x_train, y_train, batch_size=batch_size, shuffle=True ,epochs=5, verbose=1, validation_data=(x_test, y_test), callbacks=[checkpoint, reduce_lr])
 
+#Define data aumentation
 datagen = ImageDataGenerator(
     featurewise_center=True,
     featurewise_std_normalization=True,
@@ -77,11 +78,16 @@ datagen = ImageDataGenerator(
     width_shift_range=0.1,
     height_shift_range=0.1)
 
+# fit the data augmentation
+datagen.fit(x_train)
+
+# setup generator
 model.fit_generator(datagen.flow(x_train, y_train, batch_size=250),
                               steps_per_epoch=int(np.ceil(x_train.shape[0] / float(250))),
                               epochs=10,
                               validation_data=(x_test, y_test))
 
+model.fit(x_train, y_train, batch_size=batch_size, shuffle=True ,epochs=15, verbose=1, validation_data=(x_test, y_test), callbacks=[checkpoint, reduce_lr])
 
 score = model.evaluate(x_test, y_test, verbose = 0)
 
